@@ -206,6 +206,8 @@ class ProjectResource extends Resource
             ])
             ->actions([
 
+
+
                 Tables\Actions\Action::make('favorite')
                     ->label('')
                     ->icon('heroicon-o-star')

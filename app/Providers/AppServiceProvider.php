@@ -67,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
             __('Referential'),
             __('Security'),
             __('Settings'),
+            __('Chatify'),
         ]);
 
         // Force HTTPS over HTTP

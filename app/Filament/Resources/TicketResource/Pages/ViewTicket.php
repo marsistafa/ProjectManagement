@@ -92,10 +92,7 @@ class ViewTicket extends ViewRecord implements HasForms
                 ->modalHeading(__('Log worked time'))
                 ->modalSubheading(__('Use the following form to add your worked time in this ticket.'))
                 ->modalButton(__('Log'))
-                ->visible(fn() => in_array(
-                    auth()->user()->id,
-                    [$this->record->owner_id, $this->record->responsible_id]
-                ))
+                ->visible(false)
                 ->form([
                     TextInput::make('time')
                         ->label(__('Time to log'))
@@ -130,10 +127,7 @@ class ViewTicket extends ViewRecord implements HasForms
                     ->label(__('Export time logged'))
                     ->icon('heroicon-o-document-download')
                     ->color('warning')
-                    ->visible(
-                        fn() => $this->record->watchers->where('id', auth()->user()->id)->count()
-                            && $this->record->hours()->count()
-                    )
+                    ->visible(false)
                     ->action(fn() => Excel::download(
                         new TicketHoursExport($this->record),
                         'time_' . str_replace('-', '_', $this->record->code) . '.csv',

@@ -221,4 +221,22 @@ class Ticket extends Model implements HasMedia
             get: fn() => $this->estimationProgress
         );
     }
+
+
+// Add these methods to the Ticket model
+
+    public function solutionTickets(): HasMany
+    {
+        return $this->hasMany(SolutionTicket::class, 'ticket_id', 'id');
+    }
+
+    public function materialTickets(): HasMany
+    {
+        return $this->hasMany(MaterialTicket::class, 'ticket_id', 'id');
+    }
+
+    public function rfqTickets(): HasMany
+    {
+        return $this->hasMany(RFQTicket::class, 'ticket_id', 'id');
+    }
 }

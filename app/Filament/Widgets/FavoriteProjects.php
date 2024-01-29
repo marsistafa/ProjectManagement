@@ -17,7 +17,7 @@ class FavoriteProjects extends BaseWidget
 
     protected function getColumns(): int
     {
-        return 4;
+        return 1;
     }
 
     public static function canView(): bool
