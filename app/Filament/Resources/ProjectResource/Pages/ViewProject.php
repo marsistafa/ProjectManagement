@@ -13,6 +13,16 @@ class ViewProject extends ViewRecord
     protected function getActions(): array
     {
         return [
+
+            // Actions\Action::make('Solutions')
+            // ->label(fn () => 'Solutions')
+            // ->icon('heroicon-o-view-boards')
+            // ->color('secondary')
+            // ->url(function () {
+            //     return url("/projects/{$this->record->id}/solutions");
+            // }),
+        
+
             Actions\Action::make('kanban')
                 ->label(
                     fn ()
