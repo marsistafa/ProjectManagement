@@ -106,10 +106,11 @@ class ProjectResource extends Resource
                                 Forms\Components\Select::make('type')
                                     ->label(__('Project type'))
                                     ->searchable()
-                                    ->options([
-                                        'kanban' => __('Kanban'),
-                                        'scrum' => __('Scrum')
-                                    ])
+                                    ->hidden()
+                                    // ->options([
+                                    //     'kanban' => __('Kanban'),
+                                    //     // 'scrum' => __('Scrum')
+                                    // ])
                                     ->reactive()
                                     ->default(fn() => 'kanban')
                                     ->helperText(function ($state) {

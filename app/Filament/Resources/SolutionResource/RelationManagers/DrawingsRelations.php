@@ -52,38 +52,38 @@ class DrawingsRelations extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
-                Action::make('upload')
-                    ->label(__('Upload Drawing'))
-                    ->action(function ($record) {
-                        // Assuming $record is the current Solution model instance
-                        // Trigger Livewire component with the necessary properties
-                        $this->emit('OpenUploadModal', [
-                            'solution_id' => $record->id,
-                            'project_id' => $record->project_id,
-                        ]);
-                    })
-                    ->form([
-                        FileUpload::make('drawings')
-                            ->label(__('Technical Drawings'))
-                            ->multiple()
-                            ->columnSpan(2)
-                            // ->saveUploadedFileUsing(function ($file, $record) {
+                // Action::make('upload')
+                //     ->label(__('Upload Drawing'))
+                //     ->action(function ($record) {
+                //         // Assuming $record is the current Solution model instance
+                //         // Trigger Livewire component with the necessary properties
+                //         $this->emit('OpenUploadModal', [
+                //             'solution_id' => $record->id,
+                //             'project_id' => $record->project_id,
+                //         ]);
+                //     })
+                //     ->form([
+                //         FileUpload::make('drawings')
+                //             ->label(__('Technical Drawings'))
+                //             ->multiple()
+                //             ->columnSpan(2)
+                //             // ->saveUploadedFileUsing(function ($file, $record) {
                       
-                            //     $data = [
-                            //         'solution_id' => $solution_id,
-                            //         'is_approved' => 0,
-                            //         'file_path' => $file,
-                            //         'project_id' => $project_id,
-                            //         'title' => $file->getClientOriginalName(),
-                            //     ];
+                //             //     $data = [
+                //             //         'solution_id' => $solution_id,
+                //             //         'is_approved' => 0,
+                //             //         'file_path' => $file,
+                //             //         'project_id' => $project_id,
+                //             //         'title' => $file->getClientOriginalName(),
+                //             //     ];
                                 
-                            //     $request = new \Illuminate\Http\Request();
-                            //     $request->replace($data);
+                //             //     $request = new \Illuminate\Http\Request();
+                //             //     $request->replace($data);
                                 
-                            //     $controller = new DrawingController();
-                            //     $drawing = $controller->store($request);
-                            // }),
-                    ]),
+                //             //     $controller = new DrawingController();
+                //             //     $drawing = $controller->store($request);
+                //             // }),
+                //     ]),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()

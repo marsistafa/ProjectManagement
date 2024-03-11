@@ -20,8 +20,7 @@ class Solution extends Model implements HasMedia
     protected $fillable = [
         'project_id',
         'created_by',
-        'is_approved',
-        'name'
+        'is_approved'
     ];
 
     public function project()

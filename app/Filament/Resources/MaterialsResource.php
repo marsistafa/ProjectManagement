@@ -29,7 +29,7 @@ class MaterialsResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 6;
 
     public $uploadedFiles = [];
 
@@ -71,119 +71,104 @@ class MaterialsResource extends Resource
                 Forms\Components\Hidden::make('created_by')
                     ->default(fn() => Auth::user()->id),
 
-                Forms\Components\FileUpload::make('datasheet')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('datasheet')
                     ->multiple()
                     ->preserveFilenames()
-                    ->disk('local')
-                    ->saveRelationshipsUsing(function ( $data) {
-                            dd($data);
-                        if ($data['datasheet']) {
-                            $originalName = $data['datasheet']->getClientOriginalName();
-                            $validatedData['datasheet'] = $data['datasheet']->storeAs('public/material_documents/datasheet', $originalName);
-                        }
-                        if ($data['manual']) {
-                            $originalName = $data['manual']->getClientOriginalName();
-                            $validatedData['manual'] = $data['manual']->storeAs('public/material_documents/manual', $originalName);
-                        }
-                        if ($data['DOC']) {
-                            $originalName = $data['DOC']->getClientOriginalName();
-                            $validatedData['DOC'] = $data['DOC']->storeAs('public/material_documents/DOC', $originalName);
-                        }
-                        if ($data['other_documentation']) {
-                            $originalName = $data['other_documentation']->getClientOriginalName();
-                            $validatedData['other'] = $data['other_documentation']->storeAs('public/material_documents/other', $originalName);
-                        }
-                        
-                        $file = $data['datasheet'];
-        
-                        // Create or update the MaterialDocument relationship
-                        $materialDocumentData = [
-                            'datasheet' => $file,
-                            'project_id' => $data['project_id'],
-                            'material_id' => $record->id
-                        ];
-    
-                        $record->materialDocument()->create($materialDocumentData);
+                    ->reactive()
+                    ->saveRelationshipsUsing(function ($livewire, $component, $record, $state) {
+                         
+                        $file = $livewire->data['datasheet']; 
+                         
+                        foreach($file as $f){
+
+                            $originalName = $f->getClientOriginalName(); 
                 
+                            $materialDocumentData = [
+                                'datasheet' => 'public/material_documents/datasheet/'.$originalName,
+                                'project_id' => $record->project_id,
+                                'material_id' => $record->id
+                            ];
+                
+                            $record->materialDocument()->create($materialDocumentData);
+                            $f->storeAs('public/material_documents/datasheet',$originalName);
+                         
+                        }
                     }),
-                    // ->saveUploadedFileUsing(function ($file,$record,$get) {
-                                       
-                    //     $data = [
-                    //         'datasheet' => $file,
-                    //         'project_id' => $get('project_id'),
-                    //         'material_id' => $record->id??2
-                    //     ];
-                        
-                    //     $request = new \Illuminate\Http\Request();
-                    //     $request->replace($data);
-                        
-                    //     $controller = new MaterialDocumentController();
-                    //     $materialDocument = $controller->store($request);       
-                    // }),
 
-
-                Forms\Components\FileUpload::make('manual')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('manual')
                     ->multiple()
                     ->preserveFilenames()
-                    ->disk('local')
-                    ->saveUploadedFileUsing(function ($file, $record,$get) {
-                                       
-                        $data = [
-                            'name' => $get('name'),
-                            'specification' => $get('specification'),
-                            'is_approved' => $get('is_approved'),
-                            'manual' => $file,
-                            'project_id' => $get('project_id')
-                        ];
-                        
-                        $request = new \Illuminate\Http\Request();
-                        $request->replace($data);
-                        
-                        $controller = new MaterialController();
-                        $material = $controller->store($request);       
-                    }),
-                
+                    ->reactive()
+                    ->saveRelationshipsUsing(function ($livewire, $component, $record, $state) {
+                         
+                        $file = $livewire->data['manual']; 
+                         
+                        foreach($file as $f){
 
-                Forms\Components\FileUpload::make('DOC')
+                            $originalName = $f->getClientOriginalName(); 
+                
+                            $materialDocumentData = [
+                                'manual' => 'public/material_documents/manual/'.$originalName,
+                                'project_id' => $record->project_id,
+                                'material_id' => $record->id
+                            ];
+                
+                            $record->materialDocument()->create($materialDocumentData);
+                            $f->storeAs('public/material_documents/manual', $originalName);
+                        }
+                    }),
+
+
+                Forms\Components\SpatieMediaLibraryFileUpload::make('DOC')
                     ->label('DOC')
+                    ->preserveFilenames()
+                    ->reactive()
                     ->multiple()
-                    ->disk('local')
-                    ->saveUploadedFileUsing(function ($file, $record,$get) {
-                                       
-                        $data = [
-                            'name' => $get('name'),
-                            'specification' => $get('specification'),
-                            'is_approved' => $get('is_approved'),
-                            'DOC' => $file,
-                            'project_id' => $get('project_id')
-                        ];
-                        
-                        $request = new \Illuminate\Http\Request();
-                        $request->replace($data);
-                        
-                        $controller = new MaterialController();
-                        $material = $controller->store($request);       
+                    ->saveRelationshipsUsing(function ($livewire, $component, $record, $state) {
+                         
+                        $file = $livewire->data['DOC']; 
+                         
+                        foreach($file as $f){
+
+                            $originalName = $f->getClientOriginalName(); 
+                
+                            $materialDocumentData = [
+                                'DOC' => 'public/material_documents/DOC/'.$originalName,
+                                'project_id' => $record->project_id,
+                                'material_id' => $record->id
+                            ];
+                
+                            $record->materialDocument()->create($materialDocumentData);
+                            $f->storeAs('public/material_documents/DOC', $originalName);
+                        }
                     }),
 
-                Forms\Components\FileUpload::make('other_documentation')
+
+                Forms\Components\SpatieMediaLibraryFileUpload::make('other_documentation')
                     ->label('Other')
                     ->multiple()
-                    ->saveUploadedFileUsing(function ($file, $record,$get) {
-                                       
-                        $data = [
-                            'name' => $get('name'),
-                            'specification' => $get('specification'),
-                            'is_approved' => $get('is_approved'),
-                            'other_documentation' => $file,
-                            'project_id' => $get('project_id')
-                        ];
-                        
-                        $request = new \Illuminate\Http\Request();
-                        $request->replace($data);
-                        
-                        $controller = new MaterialController();
-                        $material = $controller->store($request);       
+                    ->preserveFilenames()
+                    ->reactive()
+                    ->saveRelationshipsUsing(function ($livewire, $component, $record, $state) {
+                         
+                        $file = $livewire->data['other_documentation']; 
+                         
+                        foreach($file as $f){
+
+                            $originalName = $f->getClientOriginalName(); 
+                
+                            $materialDocumentData = [
+                                'other' => 'public/material_documents/other/'.$originalName,
+                                'project_id' => $record->project_id,
+                                'material_id' => $record->id
+                            ];
+                
+                
+                            $record->materialDocument()->create($materialDocumentData);
+                            $f->storeAs('public/material_documents/other', $originalName);
+                        }
                     }),
+
                 ]);
             
     }

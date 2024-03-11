@@ -20,7 +20,8 @@ class RFQDetail extends Model
         'quantity',
         'unit_price_excl_tax',
         'total_price_excl_tax',
-        'technical_details'
+        'technical_details',
+        'created_by'
     ];
 
     protected static function boot()
@@ -50,6 +51,11 @@ class RFQDetail extends Model
     public function material()
     {
         return $this->belongsTo(Material::class, 'material_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function reCalcRequestForQuotationTotals()

@@ -31,9 +31,9 @@ class Dashboard extends BasePage
             LatestProjects::class,
             LatestTickets::class,
             TicketsByPriority::class,
-            TicketsByType::class,
-            TicketTimeLogged::class,
-            UserTimeLogged::class
+            // TicketsByType::class,
+            // TicketTimeLogged::class,
+            // UserTimeLogged::class
         ];
     }
 }

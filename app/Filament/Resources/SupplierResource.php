@@ -21,7 +21,7 @@ class SupplierResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static function getNavigationLabel(): string
     {
@@ -42,11 +42,11 @@ class SupplierResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')->required(),
-                Forms\Components\TextInput::make('nipt'),
-                Forms\Components\TextInput::make('address'),
+                Forms\Components\TextInput::make('nipt')->required(),
+                Forms\Components\TextInput::make('address')->required(),
                 Forms\Components\TextInput::make('website'),
-                Forms\Components\TextInput::make('email')->email(),
-                Forms\Components\TextInput::make('phone'),
+                Forms\Components\TextInput::make('email')->email()->required(),
+                Forms\Components\TextInput::make('phone')->required(),
 
                 // HasManyRepeater::make('requestForQuotations')
                 //     ->relationship('requestForQuotations')
@@ -63,23 +63,23 @@ class SupplierResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('nipt'),
-                TextColumn::make('address'),
-                TextColumn::make('website'),
-                TextColumn::make('email'),
-                TextColumn::make('phone'),
+                TextColumn::make('name')->searchable(),
+                TextColumn::make('nipt')->searchable(),
+                TextColumn::make('address')->searchable(),
+                TextColumn::make('website')->searchable(),
+                TextColumn::make('email')->searchable(),
+                TextColumn::make('phone')->searchable(),
              
             ])
             ->filters([
-                Filter::make('nipt')
-                    ->query(fn ($query, $value) => $query->where('nipt', 'like', "%{$value}%")),
-                Filter::make('name')
-                    ->query(fn ($query, $value) => $query->where('name', 'like', "%{$value}%")),
-                Filter::make('email')
-                    ->query(fn ($query, $value) => $query->where('email', 'like', "%{$value}%")),
-                Filter::make('phone')
-                    ->query(fn ($query, $value) => $query->where('phone', 'like', "%{$value}%")),
+                // Filter::make('nipt')
+                //     ->query(fn ($query, $value) => $query->where('nipt', 'like', "%{$value}%")),
+                // Filter::make('name')
+                //     ->query(fn ($query, $value) => $query->where('name', 'like', "%{$value}%")),
+                // Filter::make('email')
+                //     ->query(fn ($query, $value) => $query->where('email', 'like', "%{$value}%")),
+                // Filter::make('phone')
+                //     ->query(fn ($query, $value) => $query->where('phone', 'like', "%{$value}%")),
             ]);
     }
 

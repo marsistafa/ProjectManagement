@@ -41,5 +41,8 @@ class Drawing extends Model implements HasMedia
 
         );
     }
-    // Add any other relationships here as needed.
+    public function drawings()
+    {
+        return $this->belongsTo(Solution::class);
+    }
 }

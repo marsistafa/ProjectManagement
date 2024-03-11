@@ -118,7 +118,7 @@
                     @endif
                 </div>
             </div>
-
+<!-- 
             <div class="w-full flex flex-col gap-1 pt-3">
                 <span class="text-gray-500 text-sm font-medium">
                     {{ __('Total time logged') }}
@@ -153,7 +153,7 @@
                 @else
                     -
                 @endif
-            </div>
+            </div> -->
 
             <div class="w-full flex flex-col gap-1 pt-3">
                 <span class="text-gray-500 text-sm font-medium">
@@ -233,11 +233,11 @@
                         @if($tab === 'activities') border-primary-500 text-primary-500 @else text-gray-700 @endif">
                     {{ __('Activities') }}
                 </button>
-                <button wire:click="selectTab('time')"
+                <!-- <button wire:click="selectTab('time')"
                         class="md:text-xl text-sm p-3 border-b-2 border-transparent hover:border-primary-500
                         @if($tab === 'time') border-primary-500 text-primary-500 @else text-gray-700 @endif">
                     {{ __('Time logged') }}
-                </button>
+                </button> -->
                 <button wire:click="selectTab('attachments')"
                         class="md:text-xl text-sm p-3 border-b-2 border-transparent hover:border-primary-500
                         @if($tab === 'attachments') border-primary-500 text-primary-500 @else text-gray-700 @endif">

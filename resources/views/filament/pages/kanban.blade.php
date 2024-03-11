@@ -4,7 +4,7 @@
         <details class="w-full bg-white open:bg-gray-200 duration-300">
             <summary
                 class="relative w-full bg-inherit px-5 py-3 text-base cursor-pointer text-gray-500">
-                {{ __('Filteeeers') }}
+                {{ __('Filters') }}
             </summary>
             <div class="bg-white px-5 py-3">
                 <form>

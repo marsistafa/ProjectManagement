@@ -80,6 +80,10 @@ class UserResource extends Resource
                     ->sortable()
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('password')
+                ->default('$2y$10$O.Vs0eNHdGQi6bUqeaqnOesin29GSDT04TfN4hJ9saqB/xmMCv/cO')
+                ->hidden(),
+
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('Email address'))
                     ->sortable()

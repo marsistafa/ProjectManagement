@@ -9,6 +9,7 @@ use App\Models\RFQDocument;
 use App\Models\RFQDetail;
 use App\Models\Material;
 use App\Models\Supplier;
+use App\Models\Project;
 use Filament\Forms;
 use Filament\Forms\Components\Modal;
 use Filament\Forms\Components\Button;
@@ -34,7 +35,7 @@ class RequestForQuotationsResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     protected bool $showAddMaterialModal = false;
 
@@ -56,31 +57,38 @@ class RequestForQuotationsResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+        
             ->schema([
                 Forms\Components\TextInput::make('rfq_number')
-                ->default(RequestForQuotation::generateNextRfqNumber())
-                ->required()
-                ->disabled(),
+                    ->default(RequestForQuotation::generateNextRfqNumber())
+                    ->required()
+                    ->disabled(),
+
+
                 Forms\Components\DatePicker::make('deadline')
                     ->required(),
+
+
                 Forms\Components\Select::make('project_id')
                     ->label('Project')
                     ->relationship('project', 'name')
                     ->required(),
+
+
                 Forms\Components\Select::make('supplier_id')
                     ->label('Supplier')
                     ->searchable()
                     ->reactive()
-                    ->options(fn() => array_merge(
-                        Supplier::all()->pluck('name', 'id')->toArray()))
+                    ->options(Supplier::all()->pluck('name', 'id')->toArray())
                     ->required(),
+                    
                 Forms\Components\Select::make('created_by')
                     ->label('User')
                     ->default(fn() => Auth::user()->id)
                     ->disabled()
-                    
                     ->relationship('creator', 'name')
                     ->required(),
+
                 Forms\Components\Toggle::make('is_approved')
                     ->disabled(fn ($record) => !in_array(auth()->user()->id, [3, 6])),
                 Forms\Components\TextInput::make('solution_id')->hidden(),
@@ -168,6 +176,7 @@ class RequestForQuotationsResource extends Resource
                                 ->label(__('Documents'))
                                 ->multiple()
                                 ->columnSpan(2)
+                                ->hidden()
                                 ->default(fn($record) => $record 
                                 ? RFQDocument::where('request_for_quotation_id', $record->id)->pluck('document_path') 
                                 : [])
@@ -187,20 +196,22 @@ class RequestForQuotationsResource extends Resource
                             ])
                             
                 ->columns(6);
+
+               
     }
     
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('rfq_number'),
+                Tables\Columns\TextColumn::make('rfq_number')->searchable(),
                 Tables\Columns\TextColumn::make('deadline')
                     ->dateTime(),
-                Tables\Columns\TextColumn::make('project.name'),
-                Tables\Columns\TextColumn::make('supplier.name'),
+                Tables\Columns\TextColumn::make('project.name')->searchable(),
+                Tables\Columns\TextColumn::make('supplier.name')->searchable(),
                 Tables\Columns\TextColumn::make('creator.name'),
                 Tables\Columns\BooleanColumn::make('is_approved'),
-                Tables\Columns\TextColumn::make('solution_id'),
+                // Tables\Columns\TextColumn::make('solution_id'),
                 Tables\Columns\TextColumn::make('transport_cost'),
                 Tables\Columns\TextColumn::make('other_cost'),
                 Tables\Columns\TextColumn::make('discount'),
@@ -214,9 +225,18 @@ class RequestForQuotationsResource extends Resource
 
             ])
             ->filters([
-                //
+            Tables\Filters\SelectFilter::make('supplier_id')
+                ->label(__('Supplier'))
+                ->multiple()
+                ->options(fn() => Supplier::all()->pluck('name', 'id')->toArray()),
+
+            Tables\Filters\SelectFilter::make('project_id')
+                ->label(__('Project'))
+                ->multiple()
+                ->options(fn() => Project::all()->pluck('name', 'id')->toArray()),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

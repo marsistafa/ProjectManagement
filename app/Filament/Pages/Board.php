@@ -21,7 +21,7 @@ class Board extends Page implements HasForms
 
     protected static ?string $slug = 'board';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 8;
 
     protected function getSubheading(): string|Htmlable|null
     {

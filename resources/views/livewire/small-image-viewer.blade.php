@@ -2,7 +2,7 @@
     .full-screen-modal {
         width: 10vw;
         height: 10vh;
-        object-fit: cover;  // This ensures the image covers the full area
+        object-fit: cover;
     }
 </style>
 

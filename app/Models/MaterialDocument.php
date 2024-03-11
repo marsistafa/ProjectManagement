@@ -15,4 +15,9 @@ class MaterialDocument extends Model
     {
         return $this->belongsTo(Material::class);
     }
+
+    public function materialDocument()
+    {
+        return $this->belongsTo(Material::class);
+    }
 }

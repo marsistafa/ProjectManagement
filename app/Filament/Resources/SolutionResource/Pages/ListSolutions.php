@@ -38,7 +38,7 @@ class ListSolutions extends ListRecords
         ->leftJoinSub($subQuery, 'rfq', function ($join) {
             $join->on('solutions.id', '=', 'rfq.solution_id');  
         })
-        ->select('solutions.*', 'solutions.name as solution_name', 'projects.name as name', 'rfq.rfq_count as rfq_count', 'total_excl_tax','total_incl_tax')  
+        ->select('solutions.*', 'projects.name as name', 'rfq.rfq_count as rfq_count', 'total_excl_tax','total_incl_tax')  
         ->when(request()->has('solution_id'), function ($query) {
             $query->where('solutions.project_id', request('solution_id'));
         });

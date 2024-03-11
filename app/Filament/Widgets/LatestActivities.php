@@ -25,7 +25,7 @@ class LatestActivities extends BaseWidget
 
     public function mount(): void
     {
-        self::$heading = __('Latest tickets activities');
+        self::$heading = __('Latest ticket activities');
     }
 
     public static function canView(): bool

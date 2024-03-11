@@ -24,6 +24,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\DrawingController;
 use App\Http\Controllers\MaterialController;
+use Livewire\TemporaryUploadedFile; 
+use App\Http\Livewire\ImageViewer;
 
 
 class SolutionResource extends Resource
@@ -68,77 +70,86 @@ class SolutionResource extends Resource
                                 ->options(fn() => Project::all()->pluck('name', 'id')->toArray())
                                 ->required(),
 
-                                Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
-                                    ->label(__('Main Drawing'))
-                                    ->image()
-                                    ->columnSpan(1),
-
+                                // Forms\Components\SpatieMediaLibraryFileUpload::make('cover')
+                                //     ->label(__('Main Drawing'))
+                                //     ->image()
+                                //     ->columnSpan(1)
+                                //     ->reactive(),
                                 Forms\Components\Toggle::make('is_approved'),
-                                Forms\Components\FileUpload::make('drawings')
+
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('drawings')
                                     ->label(__('Technical Drawings'))
                                     ->multiple()
-                                    ->columnSpan(2)
-                                    ->default(fn($record) => $record 
-                                    ? Drawing::where('solution_id', $record->id)->pluck('file_path') 
-                                    : [])
-                                    ->saveUploadedFileUsing(function ($file, $record) {
+                                    ->preserveFilenames()
+                                    ->reactive()
+                                    ->columnSpan(3)
+                                    ->saveRelationshipsUsing(function ($livewire, $component, $record, $state) {
+                                        if(empty($livewire->data)){
+                                            $file = $livewire->mountedActionData['drawings']; 
+                                        }else{
+                                            $file = $livewire->data['drawings']; 
+                                        }
                                        
-                                        $data = [
-                                            'solution_id' => $record->id,
-                                            'is_approved' => 0,
-                                            'file_path' => $file,
-                                            'project_id' => $record->project_id,
-                                            'title' => $file->getClientOriginalName(),
-                                        ];
-                                        
-                                        $request = new \Illuminate\Http\Request();
-                                        $request->replace($data);
-                                        
-                                        $controller = new DrawingController();
-                                        $drawing = $controller->store($request);       
+                                        foreach($file as $f){
+                
+                                            $originalName = $f->getClientOriginalName(); 
+                                
+                                            $drawingData = [
+                                                'solution_id' => $record->id,
+                                                'is_approved' => 0,
+                                                'file_path' => 'public/drawings/'.$originalName,
+                                                'project_id' => $record->project_id,
+                                                'title' => $f->getClientOriginalName(),
+                                            ];
+                                
+                                            $record->drawings()->create($drawingData);
+                                            $f->storeAs('public/drawings/', $originalName);
+                                         
+                                        }
                                     }),
+                                    
 
-                                Forms\Components\FileUpload::make('materials')
-                                    ->label(__('Materials'))
-                                    ->multiple()
-                                    ->columnSpan(1)
-                                    ->default(fn($record) => $record 
-                                        ? Material::where('solution_id', $record->id)->pluck('file_name') 
-                                        : [])
-                                    ->saveUploadedFileUsing(function ($file, $record) {
-                                        // Create the data array with validated and required information
-                                        $data = [
-                                            'name' => $file->getClientOriginalName(), // Get the original name of the file
-                                            'solution_id' => $record->id, // Assuming solution_id is available in $record
-                                            'project_id' => $record->project_id, // Assuming project_id is available in $record
-                                            'specification' => 'dcvdrsc', // Set a default value or extract from somewhere if needed
-                                            'datasheet' => '', // Assuming 'datasheet' is the field you want to store the file in
-                                            'manual' => '', // Add a default value or handle accordingly
-                                            'DOC' => '', // Add a default value or handle accordingly
-                                            'other_documentation' => $file, // Add a default value or handle accordingly
-                                            'created_by' => 1, // Set to a default value or determine dynamically
-                                            'is_approved' => 0, // Set to a default value or determine dynamically
+                                // Forms\Components\FileUpload::make('materials')
+                                //     ->label(__('Materials'))
+                                //     ->multiple()
+                                //     ->columnSpan(1)
+                                //     ->default(fn($record) => $record 
+                                //         ? Material::where('solution_id', $record->id)->pluck('file_name') 
+                                //         : [])
+                                //     ->saveUploadedFileUsing(function ($file, $record) {
+                                //         // Create the data array with validated and required information
+                                //         $data = [
+                                //             'name' => $file->getClientOriginalName(), // Get the original name of the file
+                                //             'solution_id' => $record->id, // Assuming solution_id is available in $record
+                                //             'project_id' => $record->project_id, // Assuming project_id is available in $record
+                                //             'specification' => 'dcvdrsc', // Set a default value or extract from somewhere if needed
+                                //             'datasheet' => '', // Assuming 'datasheet' is the field you want to store the file in
+                                //             'manual' => '', // Add a default value or handle accordingly
+                                //             'DOC' => '', // Add a default value or handle accordingly
+                                //             'other_documentation' => $file, // Add a default value or handle accordingly
+                                //             'created_by' => 1, // Set to a default value or determine dynamically
+                                //             'is_approved' => 0, // Set to a default value or determine dynamically
                                         
-                                        ];
+                                //         ];
                                     
-                                        // Create a new request instance with the data
-                                        $request = new \Illuminate\Http\Request();
-                                        $request->replace($data);
+                                //         // Create a new request instance with the data
+                                //         $request = new \Illuminate\Http\Request();
+                                //         $request->replace($data);
                                     
-                                        // Add the file to the request as if it was uploaded
-                                        $request->files->set('other_documentation', $file);
+                                //         // Add the file to the request as if it was uploaded
+                                //         $request->files->set('other_documentation', $file);
                                     
-                                        // Create an instance of the MaterialController
-                                        $controller = new MaterialController();
+                                //         // Create an instance of the MaterialController
+                                //         $controller = new MaterialController();
                                         
-                                        // Temporarily disable middleware for the request
-                                        // This is important if your controller methods are protected by middleware (e.g., auth)
-                                        $controller->middleware('web', ['except' => ['store']]);
+                                //         // Temporarily disable middleware for the request
+                                //         // This is important if your controller methods are protected by middleware (e.g., auth)
+                                //         $controller->middleware('web', ['except' => ['store']]);
                                     
-                                        // Call the store method and pass the custom request
-                                        $material = $controller->store($request);
+                                //         // Call the store method and pass the custom request
+                                //         $material = $controller->store($request);
                                     
-                                    }),
+                                //     }),
                                 
                                 Forms\Components\Hidden::make('created_by')
                                     ->default(fn() => Auth::user()->id),
@@ -154,12 +165,15 @@ class SolutionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('cover')
-                    ->label(__('Main Drawing'))
-                    ->formatStateUsing(fn($state) => new HtmlString('
-                            <div style=\'background-image: url("' . $state . '")\'
-                                 class="w-8 h-8 bg-cover bg-center bg-no-repeat"></div>
-                        ')),
+                Tables\Columns\TextColumn::make('image')
+                ->label(__('Cover'))
+                ->default(function($record) {
+
+                    $file_path = Drawing::where('solution_id', $record->id)->pluck('file_path')->first();
+                    $newPath = str_replace('public', config('app.url') . '/storage', $file_path);
+                    return view('livewire.small-image-viewer', ['image' => $newPath]);
+
+                    }),
                 
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Project name'))
@@ -171,17 +185,17 @@ class SolutionResource extends Resource
                     ->boolean()
                     ->sortable(),
                     
-                Tables\Columns\TextColumn::make('rfq_count')
-                    ->label(__('RFQ nr'))
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('rfq_count')
+                //     ->label(__('RFQ nr'))
+                //     ->sortable(),
 
-                Tables\Columns\TextColumn::make('total_excl_tax')
-                    ->label(__('Total exc tax'))
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('total_excl_tax')
+                //     ->label(__('Total exc tax'))
+                //     ->sortable(),
 
-                Tables\Columns\TextColumn::make('total_incl_tax')
-                    ->label(__('Total tax'))
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('total_incl_tax')
+                //     ->label(__('Total tax'))
+                //     ->sortable(),
                     
 
                 Tables\Columns\TextColumn::make('created_at')

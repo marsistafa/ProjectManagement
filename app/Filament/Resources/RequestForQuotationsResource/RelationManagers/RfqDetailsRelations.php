@@ -39,6 +39,10 @@ class RfqDetailsRelations extends RelationManager
 
     public $MaterialId;
 
+    public $createdBy;
+
+ 
+
     public static function form(Form $form): Form
     {
         return $form
@@ -52,16 +56,31 @@ class RfqDetailsRelations extends RelationManager
             ->columnSpan(2)
             ->required()
             ->reactive()
+            ->afterStateUpdated(function ($state, $get, $set, $livewire) {
+                $id = $get('material_id');
+                $getName = Material::where('id',$id)->value('name');
+                $set('description', $getName);
+                $specification = Material::where('id',$id)->value('specification');
+                $set('technical_details', $specification);
+            })
             ->createOptionForm([
                 Forms\Components\TextInput::make('name')
                 ->required()
                 ->label('Name'),
+                
 
                 Forms\Components\Toggle::make('is_approved'),
 
                 Forms\Components\TextInput::make('specification')
                 ->required()
-                ->label('Specification'),
+                ->label('Specification')
+                ->reactive()
+                ->afterStateUpdated(function ($state, $get, $set, $livewire) {
+                  
+                    $set('technical_details', $get('specification'));
+               
+                }
+                ),
 
                 Forms\Components\Select::make('project_id')
                 ->label(__('Search Project'))
@@ -86,10 +105,7 @@ class RfqDetailsRelations extends RelationManager
                 }),
 
         Forms\Components\Hidden::make('description')
-        ->reactive()
-        ->default(fn(?RFQDetail $record) => $record 
-        ? $record->description
-        : Material::where('id', 2)->value('name')),
+        ->reactive(),
 
         Forms\Components\Select::make('unit')
                 ->label('Unit')
@@ -136,8 +152,16 @@ class RfqDetailsRelations extends RelationManager
                 ->required()
                 ->disabled(),
         Forms\Components\Textarea::make('technical_details')
-            ->rows(1)
-            ->columnSpan(6),
+            ->required()
+            ->columnSpan(6)
+            ->reactive()
+            ->disabled(),
+
+        Forms\Components\Select::make('created_by')
+            ->label('User')
+            ->default(fn() => Auth::user()->id)
+            ->disabled()
+            ->hidden(),
 
         Forms\Components\FileUpload::make('datasheet')
                 ->multiple()
@@ -183,6 +207,7 @@ class RfqDetailsRelations extends RelationManager
                     $controller = new MaterialDocumentController();
                     $document = $controller->store($request);      
                 }),
+
         Forms\Components\FileUpload::make('DOC')
                 ->label('DOC')
                 ->multiple()
@@ -206,6 +231,7 @@ class RfqDetailsRelations extends RelationManager
                     $controller = new MaterialDocumentController();
                     $document = $controller->store($request);       
                 }),
+
         Forms\Components\FileUpload::make('other_documentation')
                 ->label('Other')
                 ->multiple()
@@ -232,10 +258,12 @@ class RfqDetailsRelations extends RelationManager
 
         Forms\Components\Hidden::make('is_approved')
             ->default(1),
+
         Forms\Components\Hidden::make('created_by')
-                ->default(fn() => Auth::user()->id),
+            ->default(fn() => Auth::user()->id),
         ])
         ->columns(6);
+        
 
             
     }
@@ -263,6 +291,11 @@ class RfqDetailsRelations extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                // ->visible(function () {
+                   
+                //     // $parentRecord = RequestForQuotation::find($record->request_for_quotation_id);
+                //     return auth()->user()->id === $parentRecord->created_by;
+                // })
                 ->after(function (RelationManager $livewire){
                     $livewire->emit('refresh');
                 }),
@@ -279,11 +312,15 @@ class RfqDetailsRelations extends RelationManager
                     return view('livewire.url-list', ['files' => $files]);
                 }),
             
+                Tables\Actions\ViewAction::make(),
+
                 Tables\Actions\EditAction::make()
+                ->visible(fn ($record) => auth()->user()->id === $record->created_by)
                 ->after(function (RelationManager $livewire){
                     $livewire->emit('refresh');
                 }),
                 Tables\Actions\DeleteAction::make()
+                ->visible(fn ($record) => auth()->user()->id === $record->created_by)
                 ->after(function (RelationManager $livewire){
                     $livewire->emit('refresh');
                 }),
